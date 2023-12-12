@@ -1,5 +1,5 @@
 import datafusion
-from confluent_kafka import Consumer
+from confluent_kafka import Consumer, Producer
 
 from app.callback_looper import CallbackLooper
 from app.datafusion_transformer import DataFusionTransformer
@@ -37,8 +37,18 @@ if __name__ == "__main__":
     sql_query = "SELECT column_0+column_1+column_2+column_3 FROM temp_table"
     transformer = DataFusionTransformer(context=ctx, sql_query=sql_query, source_schema=source_schema)
 
-    sink = KafkaSink()
+    producer_config = {'bootstrap.servers': bootstrap_server}
+    producer = Producer(producer_config)
+    sink_topic = "test_sink_topic"
+    sink = KafkaSink(producer=producer, sink_topic=sink_topic)
 
     etl_task_iteration = ETLTaskIteration(source=source, transformer=transformer, sink=sink)
 
-    callback_looper = CallbackLooper()
+    so_long_as_condition = [3, 2, 1]
+
+
+    def so_long_as():
+        return bool(so_long_as_condition.pop() if so_long_as_condition else False)
+
+
+    callback_looper = CallbackLooper(callback=etl_task_iteration, so_long_as=so_long_as)
