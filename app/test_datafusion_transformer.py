@@ -39,4 +39,4 @@ def test_datafusion_transformer():
     transformed_data = transformer.transform(kafka_messages)
 
     # Assertions
-    assert transformed_data[0].column(0) == pa.array([75, 34], type=pa.int32())
+    assert transformed_data == [b'75', b'34']

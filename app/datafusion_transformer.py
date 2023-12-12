@@ -13,6 +13,14 @@ def get_pyarrow_type(column_type):
     return type_mapping.get(column_type, pa.null())
 
 
+def convert_back_to_kafka_messages(result):
+    temp = result[0].to_pydict()
+    values = temp.values()
+    rows = zip(*values)
+    encoded_rows = [",".join([str(r) for r in row]).encode('utf-8') for row in list(rows)]
+    return encoded_rows
+
+
 def convert_to_pyarrow_schema(source_schema):
     return pa.schema(
         [(list(column.keys())[0], get_pyarrow_type(list(column.values())[0])) for column in
@@ -38,4 +46,4 @@ class DatafusionTransformer:
         # Execute the SQL query against the registered table
         result = self.context.sql(self.sql_query).collect()
 
-        return result
+        return convert_back_to_kafka_messages(result)
