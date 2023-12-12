@@ -1,5 +1,5 @@
 # Example functions for testing
-from app.lib import pipe
+from app.kit.lib import pipe
 
 
 def multiply_by_two(x):

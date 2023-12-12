@@ -1,7 +1,6 @@
-import pyarrow as pa
 import datafusion
 
-from app.datafusion_transformer import DataFusionTransformer
+from app.transformer.datafusion_transformer import DataFusionTransformer
 
 
 def test_datafusion_transformer():

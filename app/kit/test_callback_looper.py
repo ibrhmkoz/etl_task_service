@@ -1,7 +1,7 @@
 # Tests
 from unittest.mock import MagicMock
 
-from app.callback_looper import CallbackLooper
+from app.kit.callback_looper import CallbackLooper
 
 
 def test_callback_looper_calls_callback():

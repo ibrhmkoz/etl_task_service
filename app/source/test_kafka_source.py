@@ -2,8 +2,8 @@ import subprocess
 from testcontainers.kafka import KafkaContainer
 from confluent_kafka import Consumer
 
-from app.kafka_source import KafkaSource
-from app.lib import time_block
+from app.source.kafka_source import KafkaSource
+from app.kit.lib import time_block
 
 
 def test_kafka_source():

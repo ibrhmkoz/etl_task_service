@@ -1,11 +1,11 @@
 import datafusion
 from confluent_kafka import Consumer, Producer
 
-from app.callback_looper import CallbackLooper
-from app.datafusion_transformer import DataFusionTransformer
+from app.kit.callback_looper import CallbackLooper
+from app.transformer.datafusion_transformer import DataFusionTransformer
 from app.etl_task_iteration import ETLTaskIteration
-from app.kafka_sink import KafkaSink
-from app.kafka_source import KafkaSource
+from app.sink.kafka_sink import KafkaSink
+from app.source.kafka_source import KafkaSource
 
 if __name__ == "__main__":
     bootstrap_server = 'localhost:9092'

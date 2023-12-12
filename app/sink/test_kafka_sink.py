@@ -1,7 +1,7 @@
 from testcontainers.kafka import KafkaContainer
 from confluent_kafka import Producer, Consumer
 
-from app.kafka_sink import KafkaSink
+from app.sink.kafka_sink import KafkaSink
 
 
 def test_kafka_sink():

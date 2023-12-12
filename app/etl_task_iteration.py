@@ -1,4 +1,4 @@
-from app.lib import pipe
+from app.kit.lib import pipe
 
 
 class ETLTaskIteration:
