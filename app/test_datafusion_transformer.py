@@ -1,7 +1,7 @@
 import pyarrow as pa
 import datafusion
 
-from app.datafusion_transformer import DatafusionTransformer
+from app.datafusion_transformer import DataFusionTransformer
 
 
 def test_datafusion_transformer():
@@ -33,7 +33,7 @@ def test_datafusion_transformer():
     sql_query = "SELECT column_0+column_1+column_2+column_3 FROM temp_table"
 
     # Create DatafusionTransformer instance
-    transformer = DatafusionTransformer(ctx, sql_query, source_schema)
+    transformer = DataFusionTransformer(ctx, sql_query, source_schema)
 
     # Transform data
     transformed_data = transformer.transform(kafka_messages)

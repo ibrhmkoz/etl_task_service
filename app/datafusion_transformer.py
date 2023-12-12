@@ -28,7 +28,7 @@ def convert_to_pyarrow_schema(source_schema):
     )
 
 
-class DatafusionTransformer:
+class DataFusionTransformer:
     def __init__(self, context, sql_query, source_schema):
         self.sql_query = sql_query
         self.context = context
