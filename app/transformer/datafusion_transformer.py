@@ -14,19 +14,19 @@ def get_pyarrow_type(column_type):
     return type_mapping.get(column_type, pa.null())
 
 
+def convert_to_pyarrow_schema(source_schema):
+    return pa.schema(
+        [(list(column.keys())[0], get_pyarrow_type(list(column.values())[0])) for column in
+         source_schema]
+    )
+
+
 def convert_back_to_kafka_messages(result):
     temp = result[0].to_pydict()
     values = temp.values()
     rows = zip(*values)
     encoded_rows = [",".join([str(r) for r in row]).encode('utf-8') for row in list(rows)]
     return encoded_rows
-
-
-def convert_to_pyarrow_schema(source_schema):
-    return pa.schema(
-        [(list(column.keys())[0], get_pyarrow_type(list(column.values())[0])) for column in
-         source_schema]
-    )
 
 
 class DataFusionTransformer:
@@ -36,18 +36,18 @@ class DataFusionTransformer:
         self.source_schema = convert_to_pyarrow_schema(source_schema)
 
     def transform(self, kafka_messages):
-        # Convert messages to a format suitable for Datafusion
-        rows = [[int(value) for value in msg.decode('utf-8').split(',')] for msg in kafka_messages]
-        columns = [pa.array(col) for col in zip(*rows)]  # Create PyArrow arrays for each column
-        batch = pa.RecordBatch.from_arrays(columns, schema=self.source_schema)
+        batch = self.convert_to_record_batch(kafka_messages)
 
-        # Register the batch as a table in the Datafusion context
         self.context.register_record_batches("temp_table", [[batch]])
-
-        # Execute the SQL query against the registered table
         result = self.context.sql(self.sql_query).collect()
 
         return convert_back_to_kafka_messages(result)
+
+    def convert_to_record_batch(self, kafka_messages):
+        rows = [[int(value) for value in msg.decode('utf-8').split(',')] for msg in kafka_messages]
+        columns = [pa.array(col) for col in zip(*rows)]
+        batch = pa.RecordBatch.from_arrays(columns, schema=self.source_schema)
+        return batch
 
     @staticmethod
     def create_data_fusion_transformer(sql_query, source_schema):

@@ -1,4 +1,3 @@
-# Example functions for testing
 from app.kit.lib import pipe
 
 
@@ -17,7 +16,7 @@ def concat_strings(a, b, c=""):
 # Tests
 def test_pipe_numeric_operations():
     func = pipe(multiply_by_two, add_three)
-    assert func(5) == 13  # (5 * 2) + 3
+    assert func(5) == 13
 
 
 def test_pipe_with_multiple_arguments():
