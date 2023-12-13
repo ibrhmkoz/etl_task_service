@@ -17,9 +17,12 @@ def test_kafka_source():
             consumer_config = {'bootstrap.servers': bootstrap_server,
                                'group.id': 'testgroup',
                                'auto.offset.reset': 'earliest'}
-            consumer = Consumer(consumer_config)
-            consumer.subscribe([topic])
-            kafka_source = KafkaSource(consumer, timeout=1.0, batch_size=num_records)
+            kafka_source = KafkaSource.from_consumer_config(
+                consumer_config=consumer_config,
+                topic=topic,
+                timeout=1.0,
+                batch_size=num_records
+            )
 
         # Measure the time taken to publish data to Kafka
         with time_block("Publishing data to Kafka"):

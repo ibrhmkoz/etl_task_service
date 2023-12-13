@@ -1,3 +1,6 @@
+from confluent_kafka import Producer
+
+
 class KafkaSink:
     def __init__(self, producer, sink_topic):
         self.producer = producer
@@ -10,3 +13,8 @@ class KafkaSink:
 
     def close(self):
         self.producer.flush()
+
+    @staticmethod
+    def from_producer_config(producer_config, sink_topic):
+        producer = Producer(producer_config)
+        return KafkaSink(producer, sink_topic)

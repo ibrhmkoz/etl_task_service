@@ -25,14 +25,11 @@ def test_datafusion_transformer():
         }
     ]
 
-    # Create a Datafusion context
-    ctx = datafusion.SessionContext()
-
     # Define an SQL query for transformation
     sql_query = "SELECT column_0+column_1+column_2+column_3 FROM temp_table"
 
     # Create DatafusionTransformer instance
-    transformer = DataFusionTransformer(ctx, sql_query, source_schema)
+    transformer = DataFusionTransformer.create_data_fusion_transformer(sql_query, source_schema)
 
     # Transform data
     transformed_data = transformer.transform(kafka_messages)

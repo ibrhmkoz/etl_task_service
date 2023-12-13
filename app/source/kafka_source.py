@@ -1,4 +1,4 @@
-from confluent_kafka import KafkaError
+from confluent_kafka import KafkaError, Consumer
 
 
 class KafkaSource:
@@ -26,3 +26,9 @@ class KafkaSource:
 
     def close(self):
         self.kafka_consumer.close()
+
+    @staticmethod
+    def from_consumer_config(consumer_config, topic, timeout, batch_size):
+        consumer = Consumer(consumer_config)
+        consumer.subscribe([topic])
+        return KafkaSource(consumer, timeout, batch_size)

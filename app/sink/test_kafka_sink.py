@@ -7,13 +7,12 @@ from app.sink.kafka_sink import KafkaSink
 def test_kafka_sink():
     with KafkaContainer() as kafka:
         bootstrap_server = kafka.get_bootstrap_server()
-        topic = "test_sink_topic"
         test_messages = [b'1', b'2', b'3']
 
         # Create Kafka producer
+        topic = "test_sink_topic"
         producer_config = {'bootstrap.servers': bootstrap_server}
-        producer = Producer(producer_config)
-        kafka_sink = KafkaSink(producer, topic)
+        kafka_sink = KafkaSink.from_producer_config(producer_config, topic)
 
         # Load messages using KafkaSink
         kafka_sink.load(test_messages)

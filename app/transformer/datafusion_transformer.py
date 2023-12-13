@@ -1,3 +1,4 @@
+import datafusion
 import pyarrow as pa
 
 
@@ -47,3 +48,8 @@ class DataFusionTransformer:
         result = self.context.sql(self.sql_query).collect()
 
         return convert_back_to_kafka_messages(result)
+
+    @staticmethod
+    def create_data_fusion_transformer(sql_query, source_schema):
+        ctx = datafusion.SessionContext()
+        return DataFusionTransformer(ctx, sql_query, source_schema)
