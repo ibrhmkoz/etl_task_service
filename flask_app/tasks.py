@@ -31,5 +31,9 @@ def start_etl_task(self, source_config, sink_config, sink_table, source_table, s
     )
 
     etl_task_iteration = ETLTaskIteration(source=source, transformer=transformer, sink=sink)
-    callback_looper = CallbackLooper(callback=etl_task_iteration, so_long_as=self.is_aborted)
+
+    def is_not_aborted():
+        return not self.is_aborted()
+
+    callback_looper = CallbackLooper(callback=etl_task_iteration, so_long_as=is_not_aborted)
     callback_looper.start_loop()
