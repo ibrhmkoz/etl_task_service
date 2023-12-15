@@ -18,7 +18,7 @@ def get_task_status(task_id):
 @api.route('/etl_task', methods=['POST'])
 def start_etl_task():
     task_request = request.get_json()
-    task = start_etl_celery_task.delay(task_request)
+    task = start_etl_celery_task.s(task_request).apply()
 
     response = {
         "content": "ETL task started successfully",
