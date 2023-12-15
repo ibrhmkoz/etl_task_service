@@ -11,34 +11,35 @@ KAFKA_SOURCE_TIMEOUT = 1.0
 KAFKA_BATCH_SIZE = 10
 
 
-# @shared_task(bind=True, base=AbortableTask)
-# def start_etl_task(self, source_config, sink_config, sink_table, source_table, sql):
-#     source = KafkaSource.from_consumer_config(
-#         consumer_config=source_config,
-#         topic=source_table["topic"],
-#         timeout=KAFKA_SOURCE_TIMEOUT,
-#         batch_size=KAFKA_BATCH_SIZE
-#     )
-#
-#     transformer = DataFusionTransformer.create_data_fusion_transformer(
-#         sql_query=sql,
-#         source_schema=source_table["schema"]
-#     )
-#
-#     sink = KafkaSink.from_producer_config(
-#         producer_config=sink_config["bootstrap.servers"],
-#         sink_topic=sink_table["topic"]
-#     )
-#
-#     etl_task_iteration = ETLTaskIteration(source=source, transformer=transformer, sink=sink)
-#
-#     def is_not_aborted():
-#         return not self.is_aborted()
-#
-#     callback_looper = CallbackLooper(callback=etl_task_iteration, so_long_as=is_not_aborted)
-#     callback_looper.start_loop()
-
-
 @shared_task(bind=True, base=AbortableTask)
 def start_etl_task(self, etl_task):
-    print(etl_task)
+    source_config = etl_task["source_config"]
+    sink_config = etl_task["sink_config"]
+    sink_table = etl_task["sink_table"]
+    source_table = etl_task["source_table"]
+    sql = etl_task["sql"]
+
+    source = KafkaSource.from_consumer_config(
+        consumer_config=source_config,
+        topic=source_table["topic"],
+        timeout=KAFKA_SOURCE_TIMEOUT,
+        batch_size=KAFKA_BATCH_SIZE
+    )
+
+    transformer = DataFusionTransformer.create_data_fusion_transformer(
+        sql_query=sql,
+        source_schema=source_table["schema"]
+    )
+
+    sink = KafkaSink.from_producer_config(
+        producer_config=sink_config["bootstrap.servers"],
+        sink_topic=sink_table["topic"]
+    )
+
+    etl_task_iteration = ETLTaskIteration(source=source, transformer=transformer, sink=sink)
+
+    def is_not_aborted():
+        return not self.is_aborted()
+
+    callback_looper = CallbackLooper(callback=etl_task_iteration, so_long_as=is_not_aborted)
+    callback_looper.start_loop()
