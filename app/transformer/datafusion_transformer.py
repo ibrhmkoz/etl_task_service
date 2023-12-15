@@ -30,15 +30,16 @@ def convert_back_to_kafka_messages(result):
 
 
 class DataFusionTransformer:
-    def __init__(self, context, sql_query, source_schema):
+    def __init__(self, context, sql_query, source_schema, table_name):
         self.sql_query = sql_query
         self.context = context
         self.source_schema = convert_to_pyarrow_schema(source_schema)
+        self.table_name = table_name
 
     def transform(self, kafka_messages):
         batch = self.convert_to_record_batch(kafka_messages)
 
-        self.context.register_record_batches("temp_table", [[batch]])
+        self.context.register_record_batches(self.table_name, [[batch]])
         result = self.context.sql(self.sql_query).collect()
 
         return convert_back_to_kafka_messages(result)
@@ -50,6 +51,6 @@ class DataFusionTransformer:
         return batch
 
     @staticmethod
-    def create_data_fusion_transformer(sql_query, source_schema):
+    def create_data_fusion_transformer(sql_query, source_schema, table_name):
         ctx = datafusion.SessionContext()
-        return DataFusionTransformer(ctx, sql_query, source_schema)
+        return DataFusionTransformer(ctx, sql_query, source_schema, table_name)

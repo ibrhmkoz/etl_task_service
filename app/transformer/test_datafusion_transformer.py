@@ -26,7 +26,7 @@ def test_datafusion_transformer():
 
     sql_query = "SELECT column_0+column_1+column_2+column_3 FROM temp_table"
 
-    transformer = DataFusionTransformer.create_data_fusion_transformer(sql_query, source_schema)
+    transformer = DataFusionTransformer.create_data_fusion_transformer(sql_query, source_schema, "temp_table")
 
     transformed_data = transformer.transform(kafka_messages)
 

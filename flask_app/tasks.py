@@ -32,7 +32,7 @@ def start_etl_task(self, etl_task):
     )
 
     sink = KafkaSink.from_producer_config(
-        producer_config=sink_config["bootstrap.servers"],
+        producer_config=sink_config,
         sink_topic=sink_table["topic"]
     )
 
