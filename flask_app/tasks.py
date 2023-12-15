@@ -28,7 +28,8 @@ def start_etl_task(self, etl_task):
 
     transformer = DataFusionTransformer.create_data_fusion_transformer(
         sql_query=sql,
-        source_schema=source_table["schema"]
+        source_schema=source_table["schema"],
+        table_name=source_table["table_name"]
     )
 
     sink = KafkaSink.from_producer_config(

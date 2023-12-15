@@ -1,5 +1,19 @@
 import datafusion
 import pyarrow as pa
+import pyarrow.compute as pc
+
+
+def is_even(array: pa.Array) -> pa.Array:
+    return pc.equal(pc.bit_wise_and(array, 1), 0).fill_null(False)
+
+
+is_even_arr = datafusion.udf(
+    is_even,
+    [pa.int32()],
+    pa.bool_(),
+    "stable",
+    name="is_even",
+)
 
 
 def get_pyarrow_type(column_type):
