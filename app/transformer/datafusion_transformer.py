@@ -1,3 +1,5 @@
+import uuid
+
 import datafusion
 import pyarrow as pa
 import pyarrow.compute as pc
@@ -53,8 +55,11 @@ class DataFusionTransformer:
     def transform(self, kafka_messages):
         batch = self.convert_to_record_batch(kafka_messages)
 
-        self.context.register_record_batches(self.table_name, [[batch]])
-        result = self.context.sql(self.sql_query).collect()
+        unique_table_name = f"{self.table_name}_{uuid.uuid4().hex}"
+
+        self.context.register_record_batches(unique_table_name, [[batch]])
+        modified_sql_query = self.sql_query.replace(self.table_name, unique_table_name)
+        result = self.context.sql(modified_sql_query).collect()
 
         return convert_back_to_kafka_messages(result)
 
