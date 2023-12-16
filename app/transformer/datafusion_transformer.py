@@ -53,6 +53,9 @@ class DataFusionTransformer:
         self.table_name = table_name
 
     def transform(self, kafka_messages):
+        if len(kafka_messages) == 0:
+            return []
+
         batch = self.convert_to_record_batch(kafka_messages)
 
         unique_table_name = f"{self.table_name}_{uuid.uuid4().hex}"
