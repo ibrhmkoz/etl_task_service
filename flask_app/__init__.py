@@ -8,8 +8,8 @@ def create_app():
     app = Flask(__name__)
     app.config.from_mapping(
         CELERY=dict(
-            broker_url="redis://redis",
-            result_backend="redis://redis",
+            broker_url="redis://redis-service",
+            result_backend="redis://redis-service",
             task_ignore_result=True,
         ),
     )
