@@ -3,7 +3,10 @@ kind: Service
 metadata:
   name: kafka-service
 spec:
+  type: NodePort
   ports:
     - port: 9092
+      targetPort: 9092
+      nodePort: 31092
   selector:
     app: kafka
