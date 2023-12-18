@@ -51,12 +51,11 @@ def test_retry_exceeds_max_retries():
     retried_operation = retry(always_fails, 2)
     with pytest.raises(RuntimeError) as exc_info:
         retried_operation()
-    assert str(exc_info.value) == "Failure"
+    assert "Failure" in str(exc_info.value)
+    assert "Operation failed after 2 retries. Errors: Failure; Failure" == str(exc_info.value)
 
 
 def test_retry_zero_retries_allowed():
-    operation = lambda: (_ for _ in ()).throw(ValueError("Failure"))
+    operation = lambda: "Should not be executed"
     retried_operation = retry(operation, 0)
-    with pytest.raises(ValueError) as exc_info:
-        retried_operation()
-    assert str(exc_info.value) == "Failure"
+    assert retried_operation() is None

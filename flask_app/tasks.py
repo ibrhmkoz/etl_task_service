@@ -15,6 +15,12 @@ KAFKA_BATCH_SIZE = 10
 logger = get_task_logger(__name__)
 
 
+def abort_task(abortable_task):
+    task_id = abortable_task.request.id
+    result = abortable_task.AsyncResult(task_id)
+    result.abort()
+
+
 @shared_task(bind=True, base=AbortableTask)
 def start_etl_task(self, etl_task):
     logger.info("Starting ETL task with ID: %s", self.request.id)
@@ -53,8 +59,10 @@ def start_etl_task(self, etl_task):
             retryable_etl_task_iteration()
         except Exception as e:
             is_failed = True
-            logger.exception("Error during ETL task iteration: %s", e)
-            self.abort()
+            logger.error("Error during ETL task iteration: %s", e)
+            source.close()
+            sink.close()
+            abort_task(self)
 
     callback_looper = CallbackLooper(callback=try_retryable_etl_task_iteration,
                                      so_long_as=lambda: (not self.is_aborted()) and (not is_failed))

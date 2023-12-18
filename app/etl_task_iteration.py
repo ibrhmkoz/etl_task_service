@@ -11,9 +11,4 @@ class ETLTaskIteration:
         try:
             self.pipe_function()
         except Exception as e:
-            self.clear_resources()
-            print(f"Error during ETL iteration: {e}")
-
-    def clear_resources(self):
-        self.source.close()
-        self.sink.close()
+            raise e
