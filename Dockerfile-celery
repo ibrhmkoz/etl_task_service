@@ -9,4 +9,4 @@ RUN pip install --no-cache-dir -r flask_app/requirements.txt
 RUN pip install --no-cache-dir -r app/requirements.txt
 
 
-CMD ["celery", "-A", "run.celery", "worker", "--loglevel=info"]
+CMD ["celery", "-A", "run.celery", "worker", "--concurrency=16", "--pool=eventlet", "--loglevel=info"]
