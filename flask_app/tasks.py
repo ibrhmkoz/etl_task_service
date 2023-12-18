@@ -3,16 +3,21 @@ from celery.contrib.abortable import AbortableTask
 
 from app.etl_task_iteration import ETLTaskIteration
 from app.kit.callback_looper import CallbackLooper
+from app.kit.lib import retry
 from app.sink.kafka_sink import KafkaSink
 from app.source.kafka_source import KafkaSource
 from app.transformer.datafusion_transformer import DataFusionTransformer
 
+from celery.utils.log import get_task_logger
+
 KAFKA_SOURCE_TIMEOUT = 1.0
 KAFKA_BATCH_SIZE = 10
+logger = get_task_logger(__name__)
 
 
 @shared_task(bind=True, base=AbortableTask)
 def start_etl_task(self, etl_task):
+    logger.info("Starting ETL task with ID: %s", self.request.id)
     source_config = etl_task["source_config"]
     sink_config = etl_task["sink_config"]
     sink_table = etl_task["sink_table"]
@@ -38,9 +43,20 @@ def start_etl_task(self, etl_task):
     )
 
     etl_task_iteration = ETLTaskIteration(source=source, transformer=transformer, sink=sink)
+    retryable_etl_task_iteration = retry(callback=etl_task_iteration, times=3)
 
-    def is_not_aborted():
-        return not self.is_aborted()
+    is_failed = False
 
-    callback_looper = CallbackLooper(callback=etl_task_iteration, so_long_as=is_not_aborted)
+    def try_retryable_etl_task_iteration():
+        nonlocal is_failed
+        try:
+            retryable_etl_task_iteration()
+        except Exception as e:
+            is_failed = True
+            logger.exception("Error during ETL task iteration: %s", e)
+            self.abort()
+
+    callback_looper = CallbackLooper(callback=try_retryable_etl_task_iteration,
+                                     so_long_as=lambda: (not self.is_aborted()) and (not is_failed))
+    logger.info("Starting ETL task iteration loop")
     callback_looper.start_loop()

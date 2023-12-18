@@ -23,3 +23,17 @@ def time_block(label):
     finally:
         end_time = time.time()
         print(f"Time taken for '{label}': {end_time - start_time} seconds")
+
+
+def retry(callback, times):
+    def wrapper():
+        attempts = 0
+        while attempts <= times:
+            try:
+                return callback()
+            except Exception as e:
+                attempts += 1
+                if attempts > times:
+                    raise
+        raise RuntimeError(f"Operation failed after {times} retries.")
+    return wrapper
