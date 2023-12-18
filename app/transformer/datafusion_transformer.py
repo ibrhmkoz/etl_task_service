@@ -1,21 +1,9 @@
+import importlib.util
 import uuid
+from pathlib import Path
 
 import datafusion
 import pyarrow as pa
-import pyarrow.compute as pc
-
-
-def is_even(array: pa.Array) -> pa.Array:
-    return pc.equal(pc.bit_wise_and(array, 1), 0).fill_null(False)
-
-
-is_even_arr = datafusion.udf(
-    is_even,
-    [pa.int32()],
-    pa.bool_(),
-    "stable",
-    name="is_even",
-)
 
 
 def get_pyarrow_type(column_type):
@@ -75,4 +63,14 @@ class DataFusionTransformer:
     @staticmethod
     def create_data_fusion_transformer(sql_query, source_schema, table_name):
         ctx = datafusion.SessionContext()
+
+        udf_directory = Path(__file__).parent / "user_defined_functions"
+        for filepath in udf_directory.glob("*.py"):
+            module_name = filepath.stem
+            if module_name != "__init__":
+                spec = importlib.util.spec_from_file_location(module_name, filepath)
+                udf_module = importlib.util.module_from_spec(spec)
+                spec.loader.exec_module(udf_module)
+                udf_module.register(ctx)
+
         return DataFusionTransformer(ctx, sql_query, source_schema, table_name)
