@@ -8,7 +8,4 @@ class ETLTaskIteration:
         self.pipe_function = pipe(source.extract, transformer.transform, sink.load)
 
     def __call__(self):
-        try:
-            self.pipe_function()
-        except Exception as e:
-            raise e
+        self.pipe_function()

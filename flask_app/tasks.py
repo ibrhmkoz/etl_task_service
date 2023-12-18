@@ -56,12 +56,16 @@ def start_etl_task(self, etl_task):
     def try_retryable_etl_task_iteration():
         nonlocal is_failed
         try:
+            logger.info("Starting ETL task iteration")
             retryable_etl_task_iteration()
+            logger.info("ETL task iteration completed successfully")
         except Exception as e:
             is_failed = True
             logger.error("Error during ETL task iteration: %s", e)
+            logger.info("Closing source and sink due to error")
             source.close()
             sink.close()
+            logger.info("Aborting task")
             abort_task(self)
 
     callback_looper = CallbackLooper(callback=try_retryable_etl_task_iteration,

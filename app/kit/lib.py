@@ -36,6 +36,7 @@ def retry(callback, times):
             try:
                 return callback()
             except Exception as e:
+                print(e)
                 exceptions.append(e)
                 attempts += 1
                 if attempts >= times:
