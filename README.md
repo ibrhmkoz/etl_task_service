@@ -182,8 +182,3 @@ def create_data_fusion_transformer(sql_query, source_schema, table_name):
 
 For more details on API usage, UDF creation, and system configuration, refer to the detailed documentation and example
 codebase.
-
----
-
-This README provides a high-level overview of your project, including how to get started, use the API, and add new UDFs.
-Adjust the content as needed to fit the specifics of your project and repository structure.
