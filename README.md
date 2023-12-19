@@ -66,7 +66,7 @@ Send a POST request to `http://127.0.0.1:8080/api/v1/etl_task` with the followin
       }
     ]
   },
-  "sql": "SELECT IS_EVEN(column_0 + column_1) as sum from test_table"
+  "sql": "SELECT IS_EVEN(column_0 + column_1) AS sum FROM test_table"
 }
 ```
 
